@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# Comment added to check
 
 """The setup script."""
 from setuptools import setup, find_packages
