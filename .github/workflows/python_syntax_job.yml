@@ -1,28 +1,35 @@
-name: Python Syntax Check
+name: Python Linting and Formatting
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-  syntax-check:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Python
+      - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
 
       - name: Install dependencies
-        run: pip install pylint black
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint black
 
-      - name: List modified files
-        id: list_files
-        run: echo "::set-output name=files::$(git diff --name-only HEAD $(git merge-base HEAD master) | grep '\.py$' || true)"
+      - name: Lint with pylint
+        run: |
+          pylint JSONManipulator/
+        env:
+          PYLINTHOME: ${{github.workspace}}
 
-      - name: Run Pylint
-        run: pylint --output-format=parseable ${{ steps.list_files.outputs.files }}
+      - name: Format with black
+        run: black JSONManipulator/ 
 
-      - name: Run Black
-        run: black --check --diff ${{ steps.list_files.outputs.files }}
+  # Add more jobs for building and testing your application if needed
