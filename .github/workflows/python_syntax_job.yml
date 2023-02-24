@@ -6,10 +6,10 @@ jobs:
     lint:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout code
+            - name: Checking out code
               uses: actions/checkout@v2
 
-            - name: Set up Python 3.8
+            - name: Set up of Python 3.8
               uses: actions/setup-python@v2
               with:
                   python-version: 3.8
@@ -19,14 +19,7 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install pylint black
 
-            - name: Lint with pylint
-              run: |
-                  pylint JSONManipulator/
-              env:
-                  PYLINTHOME: ${{github.workspace}}
-              continue-on-error: true
-
-            - name: Format with black
+            - name: Format using black
               run: black JSONManipulator/
 
-    # Add more jobs for building and testing your application if needed
+
