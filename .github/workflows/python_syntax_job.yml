@@ -22,7 +22,7 @@ jobs:
         run: echo "::set-output name=files::$(git diff --name-only HEAD $(git merge-base HEAD master) | grep '\.py$' || true)"
 
       - name: Run Pylint
-        run: pylint --output-format=parseable ${{ steps.list_files.outputs.files }}
+        run: pylint --file-output=y ${{ steps.list_files.outputs.files }}
 
       - name: Run Black
         run: black --check --diff ${{ steps.list_files.outputs.files }}
