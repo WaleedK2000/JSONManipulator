@@ -1,28 +1,42 @@
-name: Python Syntax Check
+name: Python Linting and Formatting
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  syntax-check:
+  lint-and-format:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.x'
 
-      - name: Install dependencies
-        run: pip install pylint black
+    - name: Install dependencies
+      run: pip install pylint black
 
-      - name: List modified files
-        id: list_files
-        run: echo "::set-output name=files::$(git diff --name-only HEAD $(git merge-base HEAD master) | grep '\.py$' || true)"
+    - name: Python Syntax Check
+      run: python -m py_compile **/*.py
 
-      - name: Run Pylint
-        run: pylint --file-output=y ${{ steps.list_files.outputs.files }}
+    - name: Run Pylint
+      run: pylint --output-format=json .
 
-      - name: Run Black
-        run: black --check --diff ${{ steps.list_files.outputs.files }}
+    - name: Run Black
+      run: black --check .
+
+    - name: Generate Pylint report
+      id: pylint-report
+      run: |
+        pylint --output-format=pylint_junit.JUnitReporter --score=y -o pylint-report.xml .
+
+    - name: Upload Pylint report
+      uses: actions/upload-artifact@v2
+      with:
+        name: pylint-report
+        path: pylint-report.xml
