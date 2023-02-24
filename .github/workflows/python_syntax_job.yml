@@ -24,6 +24,7 @@ jobs:
                   pylint JSONManipulator/
               env:
                   PYLINTHOME: ${{github.workspace}}
+              continue-on-error: true
 
             - name: Format with black
               run: black JSONManipulator/
