@@ -2,41 +2,35 @@ name: Python Linting and Formatting
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  lint-and-format:
+  lint:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
 
-    - name: Install dependencies
-      run: pip install pylint black
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint black
 
-    - name: Python Syntax Check
-      run: python -m py_compile **/*.py
+      - name: Lint with pylint
+        run: |
+          pylint src/
+          pylint tests/ --disable=missing-docstring
+        env:
+          PYLINTHOME: ${{github.workspace}}
 
-    - name: Run Pylint
-      run: pylint --output-format=json .
+      - name: Format with black
+        run: black src/ tests/
 
-    - name: Run Black
-      run: black --check .
-
-    - name: Generate Pylint report
-      id: pylint-report
-      run: |
-        pylint --output-format=pylint_junit.JUnitReporter --score=y -o pylint-report.xml .
-
-    - name: Upload Pylint report
-      uses: actions/upload-artifact@v2
-      with:
-        name: pylint-report
-        path: pylint-report.xml
+  # Add more jobs for building and testing your application if needed
